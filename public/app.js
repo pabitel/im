@@ -44,14 +44,6 @@ async function createRoom() {
   // Code for collecting ICE candidates below
   const callerCandidatesCollection = roomRef.collection('callerCandidates');
 
-  peerConnection.addEventListener('icecandidate', event => {
-    if (!event.candidate) {
-      console.log('Got final candidate!');
-      return;
-    }
-    console.log('Got candidate: ', event.candidate);
-    callerCandidatesCollection.add(event.candidate.toJSON());
-  });
   // Code for collecting ICE candidates above
 
   // Code for creating a room below
@@ -79,6 +71,19 @@ async function createRoom() {
       remoteStream.addTrack(track);
     });
   });
+
+  peerConnection.addEventListener('icecandidate', event => {
+    if (!event.candidate) {
+      console.log('Got final candidate!');
+      return;
+    }
+    console.log('Got candidate: ', event.candidate);
+    callerCandidatesCollection.add({
+      roomId: roomId,
+      candidate: event.candidate.toJSON()
+    });
+  });
+
 
   // Listening for remote session description below
   roomRef.onSnapshot(async snapshot => {
@@ -109,23 +114,21 @@ function joinRoom() {
   document.querySelector('#joinBtn').disabled = true;
 
   document.querySelector('#confirmJoinBtn').
-      addEventListener('click', async () => {
-        roomId = document.querySelector('#room-id').value;
-        console.log('Join room: ', roomId);
-        document.querySelector(
-            '#currentRoom').innerText = `Current room is ${roomId} - You are the callee!`;
-        await joinRoomById(roomId);
-      }, {once: true});
+  addEventListener('click', async () => {
+    roomId = document.querySelector('#room-id').value;
+    console.log('Join room: ', roomId);
+    document.querySelector(
+        '#currentRoom').innerText = `Current room is ${roomId} - You are the callee!`;
+    await joinRoomById(roomId);
+  }, {once: true});
   roomDialog.open();
 }
 
 async function joinRoomById(roomId) {
-  const db = firebase.firestore();
-  const roomRef = db.collection('rooms').doc(`${roomId}`);
-  const roomSnapshot = await roomRef.get();
-  console.log('Got room:', roomSnapshot.exists);
+  const room = getRoomByRoomId(roomId);
+  console.log('Got room:', room);
 
-  if (roomSnapshot.exists) {
+  if (room!=null) {
     console.log('Create PeerConnection with configuration: ', configuration);
     peerConnection = new RTCPeerConnection(configuration);
     registerPeerConnectionListeners();
@@ -141,10 +144,9 @@ async function joinRoomById(roomId) {
         return;
       }
       console.log('Got candidate: ', event.candidate);
-      calleeCandidatesCollection.add(event.candidate.toJSON());
+      addToCollection("calleeCandidates",{roomId:roomId,candidate: event.candidate.toJSON()})
     });
     // Code for collecting ICE candidates above
-
     peerConnection.addEventListener('track', event => {
       console.log('Got remote track:', event.streams[0]);
       event.streams[0].getTracks().forEach(track => {
@@ -154,7 +156,7 @@ async function joinRoomById(roomId) {
     });
 
     // Code for creating SDP answer below
-    const offer = roomSnapshot.data().offer;
+    const offer = room.offer;
     console.log('Got offer:', offer);
     await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
     const answer = await peerConnection.createAnswer();
