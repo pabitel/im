@@ -1,3 +1,8 @@
+let roomMonitor;
+let calleeCanMonitor;
+let callerCanMonitor;
+const callerCandidates = "callerCandidates";
+const calleeCandidates = "calleeCandidates";
 
 const header = {
     "X-LC-Id":"ti7gm7nhco5eOFUpgZPudCeP-gzGzoHsz",
@@ -40,7 +45,7 @@ function post(url,callback,params={}){
 
 
  function getCollection(name,params){
-    var result;
+    let result;
      get(name,(data)=>{
          result = data.results
     },params);
@@ -48,9 +53,12 @@ function post(url,callback,params={}){
 }
 
  function addToCollection(name,data){
+    let objId;
     post(name,(data)=>{
-        console.log(data)
+        console.log(`addToCollection:${name}`,data)
+        objId =  data.objectId
     },data);
+    return objId;
 }
 
  function  getRoomByRoomId(roomId){
@@ -58,15 +66,35 @@ function post(url,callback,params={}){
     console.log(data)
      return data.length>0?data[0]:null;
 }
-
- function  getRoomByCallerRoomId(roomId){
+function  getRoomByCallerRoomId(roomId){
     const data =  getCollection("rooms",{where:{"callerRoomId":roomId}})
     console.log(data)
     return data.length>0?data[0]:null;
 }
 
 
+ function  roomMonitorFun(func){
+     roomMonitor = setInterval(func,10000);
+}
 
 
-getRoomByRoomId("6315c1ab722da6529db10e38");
-console.log(1234)
+function  calleeCanMonitorFunc(func){
+    calleeCanMonitor = setInterval(func,10000);
+}
+
+function  callerCanMonitorFunc(func){
+    callerCanMonitor = setInterval(func,10000);
+}
+
+
+function  getCalleeByRoomId(roomId){
+    const data =  getCollection(calleeCandidates,{where:{"roomId":roomId}});
+    console.log(data)
+    return data;
+}
+
+function  getCallerByRoomId(roomId){
+    const data =  getCollection(callerCandidates,{where:{"roomId":roomId}});
+    console.log(data)
+    return data;
+}
