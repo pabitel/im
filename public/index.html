@@ -19,31 +19,31 @@
     <script src="jquery.js"></script>
 </head>
 <body>
-<h1>Welcome to FirebaseRTC!</h1>
+<h1>小草莓专属</h1>
 <div id="buttons">
     <button class="mdc-button mdc-button--raised" id="cameraBtn">
         <i class="material-icons mdc-button__icon" aria-hidden="true">perm_camera_mic</i>
-        <span class="mdc-button__label">Open camera & microphone</span>
+        <span class="mdc-button__label">打开视频</span>
     </button>
     <button class="mdc-button mdc-button--raised" disabled id="createBtn">
         <i class="material-icons mdc-button__icon" aria-hidden="true">group_add</i>
-        <span class="mdc-button__label">Create room</span>
+        <span class="mdc-button__label">创建房间</span>
     </button>
     <button class="mdc-button mdc-button--raised" disabled id="joinBtn">
         <i class="material-icons mdc-button__icon" aria-hidden="true">group</i>
-        <span class="mdc-button__label">Join room</span>
+        <span class="mdc-button__label">加入房间</span>
     </button>
     <button class="mdc-button mdc-button--raised" disabled id="hangupBtn">
         <i class="material-icons mdc-button__icon" aria-hidden="true">close</i>
-        <span class="mdc-button__label">Hangup</span>
+        <span class="mdc-button__label">挂断</span>
     </button>
 </div>
 <div>
     <span id="currentRoom"></span>
 </div>
 <div id="videos">
-    <video id="localVideo" muted autoplay playsinline></video>
-    <video id="remoteVideo" autoplay playsinline></video>
+    <video id="localVideo" muted autoplay playsinline class="localStyle"></video>
+    <video id="remoteVideo" autoplay playsinline class="remoteStyle"></video>
 </div>
 <div class="mdc-dialog"
      id="room-dialog"
@@ -53,22 +53,21 @@
      aria-describedby="my-dialog-content">
     <div class="mdc-dialog__container">
         <div class="mdc-dialog__surface">
-            <h2 class="mdc-dialog__title" id="my-dialog-title">Join room</h2>
+            <h2 class="mdc-dialog__title" id="my-dialog-title">加入房间</h2>
             <div class="mdc-dialog__content" id="my-dialog-content">
-                Enter ID for room to join:
+                输入房间号
                 <div class="mdc-text-field">
-                    <input type="text" id="room-id" class="mdc-text-field__input">
-                    <label class="mdc-floating-label" for="my-text-field">Room ID</label>
+                    <input type="text" id="room-id" class="mdc-text-field__input" placeholder="在这输入">
                     <div class="mdc-line-ripple"></div>
                 </div>
             </div>
             <footer class="mdc-dialog__actions">
                 <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="no">
-                    <span class="mdc-button__label">Cancel</span>
+                    <span class="mdc-button__label">取消</span>
                 </button>
                 <button id="confirmJoinBtn" type="button" class="mdc-button mdc-dialog__button"
                         data-mdc-dialog-action="yes">
-                    <span class="mdc-button__label">Join</span>
+                    <span class="mdc-button__label">加入</span>
                 </button>
             </footer>
         </div>
